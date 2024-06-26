@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+
+jobs:
+  create-release:
+    name: Create GitHub release
+    # only publish from the origin repository
+    if: github.repository_owner == 'victorshevtsov'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rustup
+        run: rustup show
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          branch: master
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-assets:
+    name: "Upload release assets"
+    needs: create-release
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: try-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
