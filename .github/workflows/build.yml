@@ -1,0 +1,14 @@
+name: Build
+
+on:
+  push:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: arc-runner-set
+
+    steps:
+    - uses: loonghao/rust-actions-toolkit@v1.0.0
